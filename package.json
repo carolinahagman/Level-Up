@@ -1,9 +1,29 @@
 {
   "private": true,
   "dependencies": {
+    "http-server": "^0.12.3",
+    "phaser": "^3.54.0",
     "prettier": "^2.2.1"
   },
   "prettier": {
     "singleQuote": true
-  }
+  },
+  "name": "level-up",
+  "description": "INSERT MANDATORY GIF",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carolinahagman/Level-Up.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/carolinahagman/Level-Up/issues"
+  },
+  "homepage": "https://github.com/carolinahagman/Level-Up#readme"
 }
