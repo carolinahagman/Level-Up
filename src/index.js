@@ -173,7 +173,7 @@ function update() {
     // Stops player from walking when key is not pressed
     player1.setVelocityX(0);
 
-    player1.anims.play('right'); // Have to change this so it does not turn left when stopped
+    player1.anims.stop(); // Have to change this so it does not turn left when stopped
   }
 
   if (cursors.up.isDown && player1.body.touching.down) {
