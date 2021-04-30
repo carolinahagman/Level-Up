@@ -13,8 +13,8 @@ import TwoBlockPlatform from './assets/twoblockplatform.png';
 
 const config = {
   type: Phaser.AUTO, // tries to render in WEBGL , if it fails, it will use Canvas
-  width: 1200,
-  height: 800,
+  width: 1600,
+  height: 900,
   physics: {
     default: 'arcade',
     arcade: {
@@ -43,6 +43,7 @@ function preload() {
   this.load.image('middleplatform', MiddlePlatform);
   this.load.image('rightplatform', RightPlatform);
   this.load.image('rightile', RightTile);
+  this.load.image('lefttile', LeftTile);
   this.load.image('twoblockplatform', TwoBlockPlatform);
 }
 
@@ -52,23 +53,64 @@ function create() {
   //this.add.image(150, 130, 'smallplatform');
   platforms = this.physics.add.staticGroup();
 
-  platforms.create(400, 200, 'smallplatform').setScale(1).refreshBody();
+  /** Middle  **/
+  platforms
+    .create(game.config.width / 2, 200, 'middleplatform')
+    .setScale(1)
+    .refreshBody();
 
-  //   var particles = this.add.particles('red');
+  platforms
+    .create(game.config.width / 2, 400, 'smallplatform')
+    .setScale(1)
+    .refreshBody();
 
-  //   var emitter = particles.createEmitter({
-  //     speed: 100,
-  //     scale: { start: 1, end: 0 },
-  //     blendMode: 'ADD',
-  //   });
+  platforms
+    .create(game.config.width / 2, 620, 'middleplatform')
+    .setScale(1)
+    .refreshBody();
 
-  //   var logo = this.physics.add.image(400, 100, 'logo');
+  platforms
+    .create(game.config.width / 2, 870, 'longplatform')
+    .setScale(1)
+    .refreshBody();
 
-  //   logo.setVelocity(100, 200);
-  //   logo.setBounce(1, 1);
-  //   logo.setCollideWorldBounds(true);
+  /** Left side 0 **/
 
-  //   emitter.startFollow(logo);*/
+  platforms.create(35, 200, 'lefttile').setScale(1).refreshBody();
+
+  platforms.create(80, 400, 'leftplatform').setScale(1).refreshBody();
+
+  platforms.create(170, 720, 'bigblock').setScale(1).refreshBody();
+
+  platforms.create(430, 460, 'smallplatform').setScale(1).refreshBody();
+
+  platforms.create(430, 250, 'twoblockplatform').setScale(1).refreshBody();
+
+  platforms.create(440, 720, 'twoblockplatform').setScale(1).refreshBody();
+
+  /** Right side **/
+
+  platforms.create(1565, 200, 'rightile').setScale(1).refreshBody();
+
+  platforms.create(1520, 400, 'rightplatform').setScale(1).refreshBody();
+
+  platforms.create(1430, 720, 'bigblock').setScale(1).refreshBody();
+
+  platforms.create(1170, 460, 'smallplatform').setScale(1).refreshBody();
+
+  platforms.create(1170, 250, 'twoblockplatform').setScale(1).refreshBody();
+
+  platforms.create(1160, 720, 'twoblockplatform').setScale(1).refreshBody();
+
+  /** Crates **/
+
+  platforms.create(1340, 522, 'crate').setScale(1).refreshBody();
+  platforms.create(260, 522, 'crate').setScale(1).refreshBody();
+
+  platforms
+    .create(game.config.width / 2, 122, 'crate')
+    .setScale(1)
+    .refreshBody();
 }
 function update() {
   game.scale.pageAlignHorizontally = true;
