@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { WeaponPlugin } from 'phaser3-weapon-plugin';
 import Background from './assets/BG.png';
 import SmallPlatform from './assets/smallplatform.png';
 import BigBlock from './assets/bigblock.png';
@@ -11,6 +12,7 @@ import RightPlatform from './assets/right-platform.png';
 import RightTile from './assets/right-tile.png';
 import TwoBlockPlatform from './assets/twoblockplatform.png';
 import Player from './assets/Sprite_player.png';
+import Arrow from './assets/arrow.png';
 
 const config = {
   type: Phaser.AUTO, // tries to render in WEBGL , if it fails, it will use Canvas
@@ -27,19 +29,24 @@ const config = {
     preload: preload,
     create: create,
     update: update,
+    render: render,
   },
 };
+
+const game = new Phaser.Game(config);
 
 let platforms;
 let player;
 let player1;
 let cursors;
+let weapon;
+let arrow;
+var arrows;
 
-const game = new Phaser.Game(config);
+let fireRate = 100;
+let nextFire = 0;
 
 function preload() {
-  //this.load.spritesheet('player1', Player1, 32, 48);
-
   this.load.image('background', Background);
   this.load.image('smallplatform', SmallPlatform);
   this.load.image('bigblock', BigBlock);
@@ -52,17 +59,22 @@ function preload() {
   this.load.image('lefttile', LeftTile);
   this.load.image('twoblockplatform', TwoBlockPlatform);
 
+  /* arrow */
+  this.load.spritesheet('arrow', Arrow, {
+    frameWidth: 64,
+    frameHeight: 64,
+  });
+
+  /* player */
   this.load.spritesheet('dude', Player, {
     frameWidth: 64,
     frameHeight: 64,
   });
-  /* player */
 }
 
 function create() {
   this.add.image(game.config.width / 2, game.config.height / 2, 'background');
 
-  //this.add.image(150, 130, 'smallplatform');
   platforms = this.physics.add.staticGroup();
 
   /** Middle  **/
@@ -124,13 +136,12 @@ function create() {
     .setScale(1)
     .refreshBody();
 
-  /*player = this.physics.add.sprite(100, 450, 'player1');
-  game.physics.enable(player, Phaser.Physics.ARCADE); */
-
-  // player = this.physics.add.sprite(100, 450, 'player');
-  player1 = this.physics.add.sprite(400, 350, 'dude', 13);
+  /** player * */
+  player1 = this.physics.add.sprite(400, 350, 'dude', 13).setScale(1.2);
 
   player1.setCollideWorldBounds(true);
+
+  player1.lastfired = 0;
 
   this.anims.create({
     key: 'left',
@@ -152,14 +163,30 @@ function create() {
     repeat: -1,
   });
 
+  this.anims.create({
+    key: 'mouse',
+    frames: this.anims.generateFrameNumbers('dude', { start: 4, end: 10 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
+  this.anims.create({
+    key: 'space',
+    frames: this.anims.generateFrameNumbers('arrow', { start: 3, end: 3 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
   cursors = this.input.keyboard.createCursorKeys();
 
   this.physics.add.collider(player1, platforms);
+  //this.physics.add.collider(arrow, platforms);
 }
+
 function update() {
-  /*game.scale.pageAlignHorizontally = true;
+  game.scale.pageAlignHorizontally = true;
   game.scale.pageAlignVertically = true;
-  game.scale.refresh(); */
+  game.scale.refresh();
 
   if (cursors.left.isDown) {
     player1.setVelocityX(-160);
@@ -179,4 +206,27 @@ function update() {
   if (cursors.up.isDown && player1.body.touching.down) {
     player1.setVelocityY(-230);
   }
+
+  /** Shooting **/
+
+  if (this.input.activePointer.isDown) {
+    arrow = this.physics.add.sprite(player1.x, player1.y, 'arrow');
+    arrow.setVelocityX(700);
+  }
+}
+
+function render() {
+  /*weapon.debug();
+  game.debug.text(
+    'Left Button: ' + game.input.activePointer.leftButton.isDown,
+    300,
+    132
+  );
+
+  game.debug.text(
+    'Active Bullets: ' + arrows.countLiving() + ' / ' + bullets.total,
+    32,
+    32
+  );
+  game.debug.spriteInfo(player1, 32, 450); */
 }
