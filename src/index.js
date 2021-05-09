@@ -42,9 +42,14 @@ let cursors;
 let weapon;
 let arrow;
 var arrows;
-
-let fireRate = 100;
+let fireRate = 500;
 let nextFire = 0;
+
+// TODO: Reset these when a player is killed
+let player1CanShoot = true;
+let player1DirectionIsRight = true;
+let player1NumberOfArrows = 3;
+let player1Lives = 1;
 
 function preload() {
   this.load.image('background', Background);
@@ -137,11 +142,7 @@ function create() {
     .refreshBody();
 
   /** player * */
-  player1 = this.physics.add.sprite(400, 350, 'dude', 13).setScale(1.2);
-
-  player1.setCollideWorldBounds(true);
-
-  player1.lastfired = 0;
+  positionPlayer1(this);
 
   this.anims.create({
     key: 'left',
@@ -172,7 +173,7 @@ function create() {
 
   this.anims.create({
     key: 'space',
-    frames: this.anims.generateFrameNumbers('arrow', { start: 3, end: 3 }),
+    frames: this.anims.generateFrameNumbers('dude', { start: 3, end: 3 }),
     frameRate: 10,
     repeat: -1,
   });
@@ -180,7 +181,15 @@ function create() {
   cursors = this.input.keyboard.createCursorKeys();
 
   this.physics.add.collider(player1, platforms);
-  //this.physics.add.collider(arrow, platforms);
+}
+
+function positionPlayer1(ctx) {
+  player1 = ctx.physics.add.sprite(400, 350, 'dude', 13).setScale(1.2);
+  player1.body.gravity.y = 250;
+
+  player1.setCollideWorldBounds(true);
+
+  player1.lastfired = 0;
 }
 
 function update() {
@@ -189,12 +198,12 @@ function update() {
   game.scale.refresh();
 
   if (cursors.left.isDown) {
+    player1DirectionIsRight = false;
     player1.setVelocityX(-160);
-
     player1.anims.play('left', true);
   } else if (cursors.right.isDown) {
+    player1DirectionIsRight = true;
     player1.setVelocityX(160);
-
     player1.anims.play('right', true);
   } else {
     // Stops player from walking when key is not pressed
@@ -203,16 +212,79 @@ function update() {
     player1.anims.stop(); // Have to change this so it does not turn left when stopped
   }
 
-  if (cursors.up.isDown && player1.body.touching.down) {
-    player1.setVelocityY(-230);
+  if (cursors.space.isDown && player1.body.touching.down) {
+    player1.setVelocityY(-450);
   }
 
   /** Shooting **/
 
   if (this.input.activePointer.isDown) {
-    arrow = this.physics.add.sprite(player1.x, player1.y, 'arrow');
-    arrow.setVelocityX(700);
+    if (player1CanShoot && player1NumberOfArrows > 0) {
+      /** Decide direction of shot **/
+      let arrowVelocityY =
+        cursors.up.isDown || cursors.down.isDown
+          ? cursors.up.isDown
+            ? -700
+            : 700
+          : 0;
+      let arrowVelocityX =
+        arrowVelocityY === 0 ? (player1DirectionIsRight ? 700 : -700) : 0;
+      let arrowAngle = cursors.down.isDown
+        ? 180
+        : cursors.up.isDown
+        ? 0
+        : player1DirectionIsRight
+        ? 90
+        : 270;
+
+      arrow = this.physics.add.sprite(
+        player1.x,
+        arrowVelocityY === 0
+          ? player1.y
+          : arrowVelocityY < 0
+          ? player1.y - 60
+          : player1.y + 60,
+        'arrow'
+      );
+      arrow.angle = arrowAngle;
+      arrow.setVelocityX(arrowVelocityX);
+      arrow.setVelocityY(arrowVelocityY);
+
+      this.physics.add.collider(arrow, platforms, arrowCollideWithPlatform);
+      this.physics.add.collider(arrow, player1, arrowCollideWithPlayer);
+
+      player1NumberOfArrows -= 1;
+      player1CanShoot = false;
+      awaitNextShot();
+    }
   }
+}
+
+/* Handle arrow collision with ground */
+function arrowCollideWithPlatform(arrow) {
+  arrow.body.allowGravity = false;
+  arrow.body.allowDrag = false;
+}
+/* Handle player collide with arrow (either pick up or get hit) */
+function arrowCollideWithPlayer(arrow) {
+  if (arrow.body.allowGravity) {
+    // Player is hit
+    // TODO: Add game over or reset of game
+    console.log('Player 1 is dead');
+    player1Lives -= 1;
+  } else {
+    // Pick up arrow
+    player1NumberOfArrows += 1;
+    arrow.destroy(true);
+    console.log('Pickup arrow');
+  }
+}
+
+/* Make sure the player can only shoot according to the fire rate */
+function awaitNextShot() {
+  setTimeout(() => {
+    player1CanShoot = true;
+  }, fireRate);
 }
 
 function render() {
