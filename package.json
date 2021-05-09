@@ -17,6 +17,7 @@
   "dependencies": {
     "http-server": "^0.12.3",
     "phaser": "^3.54.0",
+    "phaser3-weapon-plugin": "^2.1.0",
     "prettier": "^2.2.1"
   },
   "prettier": {
