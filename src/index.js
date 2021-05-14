@@ -1,17 +1,19 @@
 import Phaser from 'phaser';
 import { WeaponPlugin } from 'phaser3-weapon-plugin';
 import Background from './assets/BG.png';
-import SmallPlatform from './assets/smallplatform.png';
-import BigBlock from './assets/bigblock.png';
-import Crate from './assets/Crate.png';
-import LeftPlatform from './assets/left-platform.png';
-import LeftTile from './assets/left-tile.png';
-import LongPlatform from './assets/longplatform.png';
-import MiddlePlatform from './assets/middleplatform.png';
-import RightPlatform from './assets/right-platform.png';
-import RightTile from './assets/right-tile.png';
-import TwoBlockPlatform from './assets/twoblockplatform.png';
-import Player from './assets/Sprite_player.png';
+import SmallPlatform from './assets/smallplatform.svg';
+import BigBlock from './assets/bigblock.svg';
+import Crate from './assets/Crate.svg';
+import LeftPlatform from './assets/left-platform.svg';
+import LeftTile from './assets/left-tile.svg';
+import LongPlatform from './assets/longplatform.svg';
+import MiddlePlatform from './assets/middleplattform.svg';
+import RightPlatform from './assets/right-platform.svg';
+import RightTile from './assets/right-tile.svg';
+import TwoBlockPlatform from './assets/twoblockplatform.svg';
+import Player1 from './assets/Sprite_player.png';
+import Player2 from './assets/Sprite_player2.png';
+
 import Arrow from './assets/arrow.png';
 
 const config = {
@@ -36,8 +38,9 @@ const config = {
 const game = new Phaser.Game(config);
 
 let platforms;
-let player;
 let player1;
+let player2;
+
 let cursors;
 let weapon;
 let arrow;
@@ -51,18 +54,23 @@ let player1DirectionIsRight = true;
 let player1NumberOfArrows = 3;
 let player1Lives = 1;
 
+let player2CanShoot = true;
+let player2DirectionIsRight = false;
+let player2NumberOfArrows = 3;
+let player2Lives = 1;
+
 function preload() {
   this.load.image('background', Background);
-  this.load.image('smallplatform', SmallPlatform);
-  this.load.image('bigblock', BigBlock);
-  this.load.image('crate', Crate);
-  this.load.image('leftplatform', LeftPlatform);
-  this.load.image('longplatform', LongPlatform);
-  this.load.image('middleplatform', MiddlePlatform);
-  this.load.image('rightplatform', RightPlatform);
-  this.load.image('rightile', RightTile);
-  this.load.image('lefttile', LeftTile);
-  this.load.image('twoblockplatform', TwoBlockPlatform);
+  this.load.image('smallplatform', SmallPlatform, { trim: true });
+  this.load.image('bigblock', BigBlock, { trim: true });
+  this.load.image('crate', Crate, { trim: true });
+  this.load.image('leftplatform', LeftPlatform, { trim: true });
+  this.load.image('longplatform', LongPlatform, { trim: true });
+  this.load.image('middleplatform', MiddlePlatform, { trim: true });
+  this.load.image('rightplatform', RightPlatform, { trim: true });
+  this.load.image('rightile', RightTile, { trim: true });
+  this.load.image('lefttile', LeftTile, { trim: true });
+  this.load.image('twoblockplatform', TwoBlockPlatform, { trim: true });
 
   /* arrow */
   this.load.spritesheet('arrow', Arrow, {
@@ -70,10 +78,18 @@ function preload() {
     frameHeight: 64,
   });
 
-  /* player */
-  this.load.spritesheet('dude', Player, {
+  /* player 1 */
+  this.load.spritesheet('dude1', Player1, {
     frameWidth: 64,
     frameHeight: 64,
+    trim: true,
+  });
+
+  /* player 2 */
+  this.load.spritesheet('dude2', Player2, {
+    frameWidth: 64,
+    frameHeight: 64,
+    trim: true,
   });
 }
 
@@ -141,39 +157,73 @@ function create() {
     .setScale(1)
     .refreshBody();
 
-  /** player * */
+  /** players  */
   positionPlayer1(this);
+  positionPlayer2(this);
 
   this.anims.create({
     key: 'left',
-    frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-    frameRate: 20,
+    frames: this.anims.generateFrameNumbers('dude1', { start: 0, end: 3 }),
+    frameRate: 10,
     repeat: -1,
   });
 
   this.anims.create({
     key: 'turn',
-    frames: [{ key: 'dude', frame: 4 }],
-    frameRate: 20,
+    frames: [{ key: 'dude1', frame: 4 }],
+    frameRate: 10,
   });
 
   this.anims.create({
     key: 'right',
-    frames: this.anims.generateFrameNumbers('dude', { start: 13, end: 15 }),
+    frames: this.anims.generateFrameNumbers('dude1', { start: 13, end: 15 }),
     frameRate: 10,
     repeat: -1,
   });
 
   this.anims.create({
     key: 'mouse',
-    frames: this.anims.generateFrameNumbers('dude', { start: 4, end: 10 }),
+    frames: this.anims.generateFrameNumbers('dude1', { start: 4, end: 10 }),
     frameRate: 10,
     repeat: -1,
   });
 
   this.anims.create({
     key: 'space',
-    frames: this.anims.generateFrameNumbers('dude', { start: 3, end: 3 }),
+    frames: this.anims.generateFrameNumbers('dude1', { start: 3, end: 3 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+  this.anims.create({
+    key: 'left2',
+    frames: this.anims.generateFrameNumbers('dude2', { start: 0, end: 3 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
+  this.anims.create({
+    key: 'turn2',
+    frames: [{ key: 'dude2', frame: 4 }],
+    frameRate: 10,
+  });
+
+  this.anims.create({
+    key: 'right2',
+    frames: this.anims.generateFrameNumbers('dude2', { start: 13, end: 15 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
+  this.anims.create({
+    key: 'mouse2',
+    frames: this.anims.generateFrameNumbers('dude2', { start: 4, end: 10 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+
+  this.anims.create({
+    key: 'space2',
+    frames: this.anims.generateFrameNumbers('dude2', { start: 3, end: 3 }),
     frameRate: 10,
     repeat: -1,
   });
@@ -181,15 +231,20 @@ function create() {
   cursors = this.input.keyboard.createCursorKeys();
 
   this.physics.add.collider(player1, platforms);
+  this.physics.add.collider(player2, platforms);
 }
 
 function positionPlayer1(ctx) {
-  player1 = ctx.physics.add.sprite(400, 350, 'dude', 13).setScale(1.2);
+  player1 = ctx.physics.add.sprite(400, 350, 'dude1', 13).setScale(1.2);
   player1.body.gravity.y = 250;
 
   player1.setCollideWorldBounds(true);
+}
+function positionPlayer2(ctx) {
+  player2 = ctx.physics.add.sprite(1200, 350, 'dude2', 0).setScale(1.2);
+  player2.body.gravity.y = 250;
 
-  player1.lastfired = 0;
+  player2.setCollideWorldBounds(true);
 }
 
 function update() {
@@ -214,6 +269,25 @@ function update() {
 
   if (cursors.space.isDown && player1.body.touching.down) {
     player1.setVelocityY(-450);
+  }
+
+  if (cursors.left.isDown) {
+    player2DirectionIsRight = false;
+    player2.setVelocityX(-160);
+    player2.anims.play('left2', true);
+  } else if (cursors.right.isDown) {
+    player2DirectionIsRight = true;
+    player2.setVelocityX(160);
+    player2.anims.play('right2', true);
+  } else {
+    // Stops player from walking when key is not pressed
+    player2.setVelocityX(0);
+
+    player2.anims.stop(); // Have to change this so it does not turn left when stopped
+  }
+
+  if (cursors.space.isDown && player2.body.touching.down) {
+    player2.setVelocityY(-450);
   }
 
   /** Shooting **/
@@ -249,13 +323,58 @@ function update() {
       arrow.angle = arrowAngle;
       arrow.setVelocityX(arrowVelocityX);
       arrow.setVelocityY(arrowVelocityY);
+      arrow.setCollideWorldBounds(true);
 
       this.physics.add.collider(arrow, platforms, arrowCollideWithPlatform);
-      this.physics.add.collider(arrow, player1, arrowCollideWithPlayer);
+      this.physics.add.collider(arrow, player1, arrowCollideWithPlayer1);
+      this.physics.add.collider(arrow, player2, arrowCollideWithPlayer2);
 
       player1NumberOfArrows -= 1;
       player1CanShoot = false;
-      awaitNextShot();
+      awaitNextShotPlayer1();
+    }
+  }
+
+  if (this.input.activePointer.isDown) {
+    if (player2CanShoot && player2NumberOfArrows > 0) {
+      /** Decide direction of shot **/
+      let arrowVelocityY =
+        cursors.up.isDown || cursors.down.isDown
+          ? cursors.up.isDown
+            ? -700
+            : 700
+          : 0;
+      let arrowVelocityX =
+        arrowVelocityY === 0 ? (player2DirectionIsRight ? 700 : -700) : 0;
+      let arrowAngle = cursors.down.isDown
+        ? 180
+        : cursors.up.isDown
+        ? 0
+        : player2DirectionIsRight
+        ? 90
+        : 270;
+
+      arrow = this.physics.add.sprite(
+        player2.x,
+        arrowVelocityY === 0
+          ? player2.y
+          : arrowVelocityY < 0
+          ? player2.y - 60
+          : player2.y + 60,
+        'arrow'
+      );
+      arrow.angle = arrowAngle;
+      arrow.setVelocityX(arrowVelocityX);
+      arrow.setVelocityY(arrowVelocityY);
+      arrow.setCollideWorldBounds(true);
+
+      this.physics.add.collider(arrow, platforms, arrowCollideWithPlatform);
+      this.physics.add.collider(arrow, player1, arrowCollideWithPlayer1);
+      this.physics.add.collider(arrow, player2, arrowCollideWithPlayer2);
+
+      player2NumberOfArrows -= 1;
+      player2CanShoot = false;
+      awaitNextShotPlayer2();
     }
   }
 }
@@ -264,9 +383,11 @@ function update() {
 function arrowCollideWithPlatform(arrow) {
   arrow.body.allowGravity = false;
   arrow.body.allowDrag = false;
+  arrow.setVelocityY(0);
 }
 /* Handle player collide with arrow (either pick up or get hit) */
-function arrowCollideWithPlayer(arrow) {
+function arrowCollideWithPlayer1(arrow) {
+  console.log(arrow);
   if (arrow.body.allowGravity) {
     // Player is hit
     // TODO: Add game over or reset of game
@@ -279,11 +400,30 @@ function arrowCollideWithPlayer(arrow) {
     console.log('Pickup arrow');
   }
 }
+function arrowCollideWithPlayer2(arrow) {
+  console.log(arrow);
+  if (arrow.body.allowGravity) {
+    // Player is hit
+    // TODO: Add game over or reset of game
+    console.log('Player 2 is dead');
+    player2Lives -= 1;
+  } else {
+    // Pick up arrow
+    player2NumberOfArrows += 1;
+    arrow.destroy(true);
+    console.log('Pickup arrow');
+  }
+}
 
 /* Make sure the player can only shoot according to the fire rate */
-function awaitNextShot() {
+function awaitNextShotPlayer1() {
   setTimeout(() => {
     player1CanShoot = true;
+  }, fireRate);
+}
+function awaitNextShotPlayer2() {
+  setTimeout(() => {
+    player2CanShoot = true;
   }, fireRate);
 }
 
