@@ -44,6 +44,7 @@ let arrow;
 var arrows;
 let fireRate = 500;
 let nextFire = 0;
+let arrowDisplay;
 
 // TODO: Reset these when a player is killed
 let player1CanShoot = true;
@@ -140,6 +141,15 @@ function create() {
     .create(game.config.width / 2, 122, 'crate')
     .setScale(1)
     .refreshBody();
+
+  /** Display arrows left **/
+
+  arrowDisplay = this.add.text(370, 750, '', {
+    font: '16px Courier',
+    fill: '#00ff00',
+  });
+
+  arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
 
   /** player * */
   positionPlayer1(this);
@@ -256,6 +266,8 @@ function update() {
       player1NumberOfArrows -= 1;
       player1CanShoot = false;
       awaitNextShot();
+
+      arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
     }
   }
 }
@@ -277,6 +289,7 @@ function arrowCollideWithPlayer(arrow) {
     player1NumberOfArrows += 1;
     arrow.destroy(true);
     console.log('Pickup arrow');
+    arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
   }
 }
 
