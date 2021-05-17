@@ -157,6 +157,15 @@ function create() {
     .setScale(1)
     .refreshBody();
 
+  /** Display arrows left **/
+
+  arrowDisplay = this.add.text(370, 750, '', {
+    font: '16px Courier',
+    fill: '#00ff00',
+  });
+
+  arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
+
   /** players  */
   positionPlayer1(this);
   positionPlayer2(this);
@@ -332,6 +341,8 @@ function update() {
       player1NumberOfArrows -= 1;
       player1CanShoot = false;
       awaitNextShotPlayer1();
+
+      arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
     }
   }
 
@@ -375,6 +386,8 @@ function update() {
       player2NumberOfArrows -= 1;
       player2CanShoot = false;
       awaitNextShotPlayer2();
+
+      arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
     }
   }
 }
