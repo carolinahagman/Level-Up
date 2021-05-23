@@ -1,10 +1,10 @@
 import Phaser, { Scene } from 'phaser';
-import Background from '../assets/BG.png';
+import background from '../assets/BG.png';
 
-let P1Display;
-let P2Display;
-let P1Ready = false;
-let P2Ready = false;
+let p1Display;
+let p2Display;
+let p1Ready = false;
+let p2Ready = false;
 
 let cursors;
 
@@ -14,17 +14,21 @@ class StartScene extends Scene {
   }
 
   preload() {
-    this.load.image('background', Background);
+    this.load.image('background', background);
+  }
+  init() {
+    console.log('INIT');
   }
 
   create() {
+    console.log('CREATE');
     this.add.image(
       this.game.config.width / 2,
       this.game.config.height / 2,
       'background'
     );
 
-    this.TitleText = this.add.text(
+    this.titleText = this.add.text(
       700,
       120,
       'Towerfall',
@@ -35,18 +39,18 @@ class StartScene extends Scene {
       }
     );
 
-    P1Display = this.add.text(400, 700, '', {
+    p1Display = this.add.text(400, 700, '', {
       font: '20px Courier',
       fill: '#00ff00',
     });
 
-    P1Display.setText(['P1 press SPACE when ready']);
+    p1Display.setText(['P1 press SPACE when ready']);
 
-    P2Display = this.add.text(900, 700, '', {
+    p2Display = this.add.text(900, 700, '', {
       font: '20px Courier',
       fill: '#00ff00',
     });
-    P2Display.setText(['P2 press UP when ready']);
+    p2Display.setText(['P2 press UP when ready']);
 
     this.anims.create({
       key: 'space',
@@ -61,16 +65,17 @@ class StartScene extends Scene {
 
   update() {
     if (cursors.space.isDown) {
-      P1Ready = true;
-      P1Display.setText(['Player 1 is ready']);
+      p1Ready = true;
+      p1Display.setText(['Player 1 is ready']);
     }
     if (cursors.up.isDown) {
-      P2Ready = true;
-      P2Display.setText(['Player 2 is ready']);
+      p2Ready = true;
+      p2Display.setText(['Player 2 is ready']);
     }
 
-    if (P2Ready === true && P1Ready === true) {
-      this.StartText = this.add.text(
+    // if (p2Ready === true && p1Ready === true) {
+    if (true) {
+      this.startText = this.add.text(
         720,
         250,
         'Start',
@@ -80,10 +85,10 @@ class StartScene extends Scene {
           fill: '#000',
         }
       );
-      this.StartText.setInteractive({ useHandCursor: true }).on(
-        'pointerdown',
-        () => this.scene.start('Game')
-      );
+      this.scene.start('Game');
+      this.startText
+        .setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => this.scene.start('Game'));
     }
   }
 }
