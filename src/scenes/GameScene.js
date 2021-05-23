@@ -13,18 +13,24 @@ import TwoBlockPlatform from '../assets/twoblockplatform.svg';
 import Player1 from '../assets/Sprite_player.png';
 import Player2 from '../assets/Sprite_player2.png';
 import Arrow from '../assets/arrow.png';
+import { socket } from './StartScene';
 
 let platforms;
 let player1;
 let player2;
 
 let cursors;
+let keys;
 let weapon;
 let arrow;
 var arrows;
 let fireRate = 500;
 let nextFire = 0;
-let arrowDisplay;
+let P1Display;
+let P1arrowDisplay;
+
+let P2Display;
+let P2arrowDisplay;
 
 // TODO: Reset these when a player is killed
 let player1CanShoot = true;
@@ -148,12 +154,30 @@ export default class GameScene extends Phaser.Scene {
 
     /** Display arrows left **/
 
-    arrowDisplay = this.add.text(370, 750, '', {
-      font: '16px Courier',
+    P1arrowDisplay = this.add.text(370, 840, '', {
+      font: '18px Courier',
       fill: '#00ff00',
     });
 
-    arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
+    P1Display = this.add.text(370, 800, '', {
+      font: '20px Courier',
+      fill: '#00ff00',
+    });
+
+    P1Display.setText(['Player 1']);
+    P1arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
+
+    P2arrowDisplay = this.add.text(1090, 840, '', {
+      font: '18px Courier',
+      fill: '#00ff00',
+    });
+
+    P2Display = this.add.text(1090, 800, '', {
+      font: '20px Courier',
+      fill: '#00ff00',
+    });
+    P2Display.setText(['Player 2']);
+    P2arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
 
     /** players  */
     this.positionPlayer1(this);
@@ -192,6 +216,8 @@ export default class GameScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
+
+    /***  player2 to the right ***/
     this.anims.create({
       key: 'left2',
       frames: this.anims.generateFrameNumbers('dude2', { start: 0, end: 3 }),
@@ -227,6 +253,7 @@ export default class GameScene extends Phaser.Scene {
     });
 
     cursors = this.input.keyboard.createCursorKeys();
+    keys = this.input.keyboard.addKeys('A,S,D,W');
 
     this.physics.add.collider(player1, platforms);
     this.physics.add.collider(player2, platforms);
@@ -250,11 +277,11 @@ export default class GameScene extends Phaser.Scene {
     this.game.scale.pageAlignVertically = true;
     this.game.scale.refresh();
 
-    if (cursors.left.isDown) {
+    if (keys.A.isDown) {
       player1DirectionIsRight = false;
       player1.setVelocityX(-160);
       player1.anims.play('left', true);
-    } else if (cursors.right.isDown) {
+    } else if (keys.D.isDown) {
       player1DirectionIsRight = true;
       player1.setVelocityX(160);
       player1.anims.play('right', true);
@@ -265,7 +292,7 @@ export default class GameScene extends Phaser.Scene {
       player1.anims.stop(); // Have to change this so it does not turn left when stopped
     }
 
-    if (cursors.space.isDown && player1.body.touching.down) {
+    if (keys.W.isDown && player1.body.touching.down) {
       player1.setVelocityY(-450);
     }
 
@@ -284,13 +311,13 @@ export default class GameScene extends Phaser.Scene {
       player2.anims.stop(); // Have to change this so it does not turn left when stopped
     }
 
-    if (cursors.space.isDown && player2.body.touching.down) {
+    if (cursors.up.isDown && player2.body.touching.down) {
       player2.setVelocityY(-450);
     }
 
     /** Shooting **/
 
-    if (this.input.activePointer.isDown) {
+    if (cursors.space.isDown) {
       if (player1CanShoot && player1NumberOfArrows > 0) {
         /** Decide direction of shot **/
         let arrowVelocityY =
@@ -331,7 +358,7 @@ export default class GameScene extends Phaser.Scene {
         player1CanShoot = false;
         awaitNextShotPlayer1();
 
-        arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
+        P1arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
       }
     }
 
@@ -376,7 +403,7 @@ export default class GameScene extends Phaser.Scene {
         player2CanShoot = false;
         awaitNextShotPlayer2();
 
-        arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
+        P2arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
       }
     }
   }
@@ -400,6 +427,7 @@ function arrowCollideWithPlayer1(arrow) {
     // Pick up arrow
     player1NumberOfArrows += 1;
     arrow.destroy(true);
+    arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
     console.log('Pickup arrow');
   }
 }
@@ -414,6 +442,7 @@ function arrowCollideWithPlayer2(arrow) {
     // Pick up arrow
     player2NumberOfArrows += 1;
     arrow.destroy(true);
+    P2arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
     console.log('Pickup arrow');
   }
 }

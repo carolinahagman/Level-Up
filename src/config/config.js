@@ -7,6 +7,9 @@ const config = {
   width: 1600,
   height: 900,
   parent: 'game',
+  scale: {
+    mode: Phaser.Scale.FIT,
+  },
   scene: [StartScene, GameScene],
   physics: {
     default: 'arcade',
