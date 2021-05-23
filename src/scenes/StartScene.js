@@ -16,12 +16,8 @@ class StartScene extends Scene {
   preload() {
     this.load.image('background', background);
   }
-  init() {
-    console.log('INIT');
-  }
 
   create() {
-    console.log('CREATE');
     this.add.image(
       this.game.config.width / 2,
       this.game.config.height / 2,
@@ -73,8 +69,7 @@ class StartScene extends Scene {
       p2Display.setText(['Player 2 is ready']);
     }
 
-    // if (p2Ready === true && p1Ready === true) {
-    if (true) {
+    if (p2Ready === true && p1Ready === true) {
       this.startText = this.add.text(
         720,
         250,
@@ -85,7 +80,7 @@ class StartScene extends Scene {
           fill: '#000',
         }
       );
-      this.scene.start('Game');
+
       this.startText
         .setInteractive({ useHandCursor: true })
         .on('pointerdown', () => this.scene.start('Game'));

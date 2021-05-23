@@ -43,7 +43,6 @@ let player2DirectionIsRight = false;
 let player2NumberOfArrows = 3;
 let player2Lives = 1;
 
-console.log();
 let enterKey;
 
 export default class GameScene extends Phaser.Scene {
@@ -88,8 +87,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // this.socket = io();
-
     this.add.image(
       this.game.config.width / 2,
       this.game.config.height / 2,
@@ -100,7 +97,7 @@ export default class GameScene extends Phaser.Scene {
 
     /** Middle  **/
     platforms
-      .create(this.game.config.width / 2, 200, 'middleplatform')
+      .create(this.game.config.width / 2, 190, 'middleplatform')
       .setScale(1)
       .refreshBody();
 
@@ -115,7 +112,7 @@ export default class GameScene extends Phaser.Scene {
       .refreshBody();
 
     platforms
-      .create(this.game.config.width / 2, 870, 'longplatform')
+      .create(this.game.config.width / 2, 860, 'longplatform')
       .setScale(1)
       .refreshBody();
 
@@ -187,6 +184,26 @@ export default class GameScene extends Phaser.Scene {
     /** players  */
     this.positionPlayer1(this);
     this.positionPlayer2(this);
+    player1.body.onWorldBounds = true;
+    player2.body.onWorldBounds = true;
+
+    this.physics.world.on('worldbounds', function (body) {
+      if (body.position.x > 1523.1) {
+        // Went over on right side
+        body.position.x = 0;
+      } else if (body.position.x === 0) {
+        // Went over on left side
+        body.position.x = 1523.1;
+      } else if (body.position.y === 0) {
+        // THIS WAS BAD
+        // Went over top
+        // body.position.y = 823.1;
+        // body.setVelocityY(-1 * body.velocityY);
+      } else if (body.position.y > 823.1) {
+        // Went over bottom
+        body.position.y = 0;
+      }
+    });
 
     this.anims.create({
       key: 'left',
@@ -263,6 +280,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(player1, platforms);
     this.physics.add.collider(player2, platforms);
+    this.physics.add.collider(player1, player2);
   }
 
   positionPlayer1(ctx) {
@@ -280,7 +298,6 @@ export default class GameScene extends Phaser.Scene {
 
   update() {
     if (this.restart) {
-      console.log('RESTART THE FREAKIN GAME');
       this.scene.restart();
     }
     this.game.scale.pageAlignHorizontally = true;
@@ -325,6 +342,9 @@ export default class GameScene extends Phaser.Scene {
       player2.setVelocityY(-450);
     }
 
+    /** Check if player is jumped on **/
+    checkIfJumpedOn();
+
     /** Shooting **/
 
     if (cursors.space.isDown) {
@@ -354,7 +374,6 @@ export default class GameScene extends Phaser.Scene {
         arrow.angle = arrowAngle;
         arrow.setVelocityX(arrowVelocityX);
         arrow.setVelocityY(arrowVelocityY);
-        console.log(arrow.body);
         arrow.body.allowGravity = true;
         arrow.body.setGravityY(100);
         arrow.setCollideWorldBounds(true);
@@ -435,7 +454,6 @@ function arrowCollideWithPlatform(arrow) {
 }
 /* Handle player collide with arrow (either pick up or get hit) */
 function arrowCollideWithPlayer1(arrow) {
-  console.log(arrow);
   if (!arrow.inactive) {
     // Player is hit
     console.log('Player 1 is dead');
@@ -449,7 +467,6 @@ function arrowCollideWithPlayer1(arrow) {
   }
 }
 function arrowCollideWithPlayer2(arrow) {
-  console.log(arrow);
   if (!arrow.inactive) {
     // Player is hit
     console.log('Player 2 is dead');
@@ -473,4 +490,23 @@ function awaitNextShotPlayer2() {
   setTimeout(() => {
     player2CanShoot = true;
   }, fireRate);
+}
+
+/** Check if one player jumped on the other one **/
+function checkIfJumpedOn() {
+  let bounds1 = player1.getBounds();
+  let bounds2 = player2.getBounds();
+
+  let isIntersecting = Phaser.Geom.Intersects.RectangleToRectangle(
+    bounds1,
+    bounds2
+  );
+
+  if (isIntersecting) {
+    if (bounds2.y - bounds1.y > 72.8) {
+      player2Lives--;
+    } else if (bounds1.y - bounds2.y > 72.8) {
+      player1Lives--;
+    }
+  }
 }
