@@ -26,11 +26,11 @@ let arrow;
 var arrows;
 let fireRate = 500;
 let nextFire = 0;
-let P1Display;
-let P1arrowDisplay;
+let p1Display;
+let p1ArrowDisplay;
 
-let P2Display;
-let P2arrowDisplay;
+let p2Display;
+let p2ArrowDisplay;
 
 // TODO: Reset these when a player is killed
 let player1CanShoot = true;
@@ -43,12 +43,16 @@ let player2DirectionIsRight = false;
 let player2NumberOfArrows = 3;
 let player2Lives = 1;
 
+let enterKey;
+
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super('Game');
   }
-
   preload() {
+    player1Lives = player2Lives = 1;
+    player1CanShoot = player2CanShoot = true;
+    player1NumberOfArrows = player2NumberOfArrows = 3;
     this.load.image('background', Background);
     this.load.image('smallplatform', SmallPlatform, { trim: true });
     this.load.image('bigblock', BigBlock, { trim: true });
@@ -83,8 +87,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // this.socket = io();
-
     this.add.image(
       this.game.config.width / 2,
       this.game.config.height / 2,
@@ -95,7 +97,7 @@ export default class GameScene extends Phaser.Scene {
 
     /** Middle  **/
     platforms
-      .create(this.game.config.width / 2, 200, 'middleplatform')
+      .create(this.game.config.width / 2, 190, 'middleplatform')
       .setScale(1)
       .refreshBody();
 
@@ -110,7 +112,7 @@ export default class GameScene extends Phaser.Scene {
       .refreshBody();
 
     platforms
-      .create(this.game.config.width / 2, 870, 'longplatform')
+      .create(this.game.config.width / 2, 860, 'longplatform')
       .setScale(1)
       .refreshBody();
 
@@ -154,34 +156,54 @@ export default class GameScene extends Phaser.Scene {
 
     /** Display arrows left **/
 
-    P1arrowDisplay = this.add.text(370, 840, '', {
+    p1ArrowDisplay = this.add.text(370, 840, '', {
       font: '18px Courier',
       fill: '#00ff00',
     });
 
-    P1Display = this.add.text(370, 800, '', {
+    p1Display = this.add.text(370, 800, '', {
       font: '20px Courier',
       fill: '#00ff00',
     });
 
-    P1Display.setText(['Player 1']);
-    P1arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
+    p1Display.setText(['Player 1']);
+    p1ArrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
 
-    P2arrowDisplay = this.add.text(1090, 840, '', {
+    p2ArrowDisplay = this.add.text(1090, 840, '', {
       font: '18px Courier',
       fill: '#00ff00',
     });
 
-    P2Display = this.add.text(1090, 800, '', {
+    p2Display = this.add.text(1090, 800, '', {
       font: '20px Courier',
       fill: '#00ff00',
     });
-    P2Display.setText(['Player 2']);
-    P2arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
+    p2Display.setText(['Player 2']);
+    p2ArrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
 
     /** players  */
     this.positionPlayer1(this);
     this.positionPlayer2(this);
+    player1.body.onWorldBounds = true;
+    player2.body.onWorldBounds = true;
+
+    this.physics.world.on('worldbounds', function (body) {
+      if (body.position.x > 1523.1) {
+        // Went over on right side
+        body.position.x = 0;
+      } else if (body.position.x === 0) {
+        // Went over on left side
+        body.position.x = 1523.1;
+      } else if (body.position.y === 0) {
+        // THIS WAS BAD
+        // Went over top
+        // body.position.y = 823.1;
+        // body.setVelocityY(-1 * body.velocityY);
+      } else if (body.position.y > 823.1) {
+        // Went over bottom
+        body.position.y = 0;
+      }
+    });
 
     this.anims.create({
       key: 'left',
@@ -254,25 +276,30 @@ export default class GameScene extends Phaser.Scene {
 
     cursors = this.input.keyboard.createCursorKeys();
     keys = this.input.keyboard.addKeys('A,S,D,W');
+    enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
     this.physics.add.collider(player1, platforms);
     this.physics.add.collider(player2, platforms);
+    this.physics.add.collider(player1, player2);
   }
 
   positionPlayer1(ctx) {
     player1 = ctx.physics.add.sprite(400, 350, 'dude1', 13).setScale(1.2);
-    player1.body.gravity.y = 250;
+    player1.body.gravity.y = 550;
 
     player1.setCollideWorldBounds(true);
   }
   positionPlayer2(ctx) {
     player2 = ctx.physics.add.sprite(1200, 350, 'dude2', 0).setScale(1.2);
-    player2.body.gravity.y = 250;
+    player2.body.gravity.y = 550;
 
     player2.setCollideWorldBounds(true);
   }
 
   update() {
+    if (this.restart) {
+      this.scene.restart();
+    }
     this.game.scale.pageAlignHorizontally = true;
     this.game.scale.pageAlignVertically = true;
     this.game.scale.refresh();
@@ -315,22 +342,21 @@ export default class GameScene extends Phaser.Scene {
       player2.setVelocityY(-450);
     }
 
+    /** Check if player is jumped on **/
+    checkIfJumpedOn();
+
     /** Shooting **/
 
     if (cursors.space.isDown) {
       if (player1CanShoot && player1NumberOfArrows > 0) {
         /** Decide direction of shot **/
         let arrowVelocityY =
-          cursors.up.isDown || cursors.down.isDown
-            ? cursors.up.isDown
-              ? -700
-              : 700
-            : 0;
+          keys.W.isDown || keys.S.isDown ? (keys.W.isDown ? -700 : 700) : 0;
         let arrowVelocityX =
           arrowVelocityY === 0 ? (player1DirectionIsRight ? 700 : -700) : 0;
-        let arrowAngle = cursors.down.isDown
+        let arrowAngle = keys.S.isDown
           ? 180
-          : cursors.up.isDown
+          : keys.W.isDown
           ? 0
           : player1DirectionIsRight
           ? 90
@@ -348,6 +374,8 @@ export default class GameScene extends Phaser.Scene {
         arrow.angle = arrowAngle;
         arrow.setVelocityX(arrowVelocityX);
         arrow.setVelocityY(arrowVelocityY);
+        arrow.body.allowGravity = true;
+        arrow.body.setGravityY(100);
         arrow.setCollideWorldBounds(true);
 
         this.physics.add.collider(arrow, platforms, arrowCollideWithPlatform);
@@ -358,11 +386,11 @@ export default class GameScene extends Phaser.Scene {
         player1CanShoot = false;
         awaitNextShotPlayer1();
 
-        P1arrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
+        p1ArrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
       }
     }
 
-    if (this.input.activePointer.isDown) {
+    if (enterKey.isDown) {
       if (player2CanShoot && player2NumberOfArrows > 0) {
         /** Decide direction of shot **/
         let arrowVelocityY =
@@ -393,6 +421,7 @@ export default class GameScene extends Phaser.Scene {
         arrow.angle = arrowAngle;
         arrow.setVelocityX(arrowVelocityX);
         arrow.setVelocityY(arrowVelocityY);
+        arrow.body.setGravityY(100);
         arrow.setCollideWorldBounds(true);
 
         this.physics.add.collider(arrow, platforms, arrowCollideWithPlatform);
@@ -403,46 +432,50 @@ export default class GameScene extends Phaser.Scene {
         player2CanShoot = false;
         awaitNextShotPlayer2();
 
-        P2arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
+        p2ArrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
       }
+    }
+
+    if (player1Lives <= 0 || player2Lives <= 0) {
+      this.scene.start('gameover', {
+        winningPlayerNo: player1Lives <= 0 ? 2 : 1,
+      });
     }
   }
 }
 
 /* Handle arrow collision with ground */
 function arrowCollideWithPlatform(arrow) {
+  arrow.inactive = true;
   arrow.body.allowGravity = false;
   arrow.body.allowDrag = false;
   arrow.setVelocityY(0);
+  arrow.setVelocityX(0);
 }
 /* Handle player collide with arrow (either pick up or get hit) */
 function arrowCollideWithPlayer1(arrow) {
-  console.log(arrow);
-  if (arrow.body.allowGravity) {
+  if (!arrow.inactive) {
     // Player is hit
-    // TODO: Add game over or reset of game
     console.log('Player 1 is dead');
     player1Lives -= 1;
   } else {
     // Pick up arrow
     player1NumberOfArrows += 1;
     arrow.destroy(true);
-    arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
+    p1ArrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
     console.log('Pickup arrow');
   }
 }
 function arrowCollideWithPlayer2(arrow) {
-  console.log(arrow);
-  if (arrow.body.allowGravity) {
+  if (!arrow.inactive) {
     // Player is hit
-    // TODO: Add game over or reset of game
     console.log('Player 2 is dead');
     player2Lives -= 1;
   } else {
     // Pick up arrow
     player2NumberOfArrows += 1;
     arrow.destroy(true);
-    P2arrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
+    p2ArrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
     console.log('Pickup arrow');
   }
 }
@@ -457,4 +490,23 @@ function awaitNextShotPlayer2() {
   setTimeout(() => {
     player2CanShoot = true;
   }, fireRate);
+}
+
+/** Check if one player jumped on the other one **/
+function checkIfJumpedOn() {
+  let bounds1 = player1.getBounds();
+  let bounds2 = player2.getBounds();
+
+  let isIntersecting = Phaser.Geom.Intersects.RectangleToRectangle(
+    bounds1,
+    bounds2
+  );
+
+  if (isIntersecting) {
+    if (bounds2.y - bounds1.y > 72.8) {
+      player2Lives--;
+    } else if (bounds1.y - bounds2.y > 72.8) {
+      player1Lives--;
+    }
+  }
 }

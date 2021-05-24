@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import GameOverScene from '../scenes/GameOverScene';
 import GameScene from '../scenes/GameScene';
 import StartScene from '../scenes/StartScene';
 
@@ -10,12 +11,11 @@ const config = {
   scale: {
     mode: Phaser.Scale.FIT,
   },
-  scene: [StartScene, GameScene],
+  scene: [StartScene, GameScene, GameOverScene],
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { y: 300 },
-      debug: false,
+      debug: true,
     },
   },
 };
