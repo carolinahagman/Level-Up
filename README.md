@@ -18,6 +18,7 @@ $ git clone https://github.com/carolinahagman/Level-Up.git
 type `npm install` followed by `npm start`
 
 in your preferred browser type `localhost:8080`
+some issues in brave
 
 Find a friend and play!
 
@@ -37,6 +38,7 @@ Find a friend and play!
 - [#12 - Add changelogs](https://github.com/carolinahagman/Level-Up/pull/12)
 - [#13 - Add controls to start scene](https://github.com/carolinahagman/Level-Up/pull/13)
 - [#14 - Fix small mistakes](https://github.com/carolinahagman/Level-Up/pull/14)
+- [#15 - Add a surprise feature and testers](https://github.com/carolinahagman/Level-Up/pull/15)
 
 # Code Review
 
@@ -53,7 +55,7 @@ Tested by the following people:
 
 Tested by the following muggles (non-coders):
 
-1. Jane Doe
-2. John Doe
+1. Nina Blom
+2. Oscar Magnusson
 3. Jane Doe
 4. John Doe
