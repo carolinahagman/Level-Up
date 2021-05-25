@@ -40,15 +40,26 @@ Find a friend and play!
 
 # Code Review
 
-1. `example.js:10-15` - Remember to think about X and this could be refactored using the amazing Y function.
+1. Some instructions on the goal of the game would be helpful for those who dont know Towerfall from before. E.g, purpose of the crate.
+2. index:4 and StartScene:90: don't forget to delete outcommented/ not used code
+3. Player gets stuck between the crates and the platform - is it a feature/ is it a bug? :beetle:
+4. Players can get killed by their own arrows :sob:
+5. When the two player meets, one of them dies even without arrows being fired
+6. Love that you can come out on the other side of the field -sneak-attack!
+7. GameScene:336: cool feature that you can shoot at different directions
+8. GameScene:443: love that you can pick up your arrows!
+9. Fun, that it is multiplayer
+10. The code is very well organised and easy to understand
+
+Really good job with the game! :tada:
 
 # Testers
 
 Tested by the following people:
 
-1. Jane Doe
-2. John Doe
-3. Jane Doe
+1. Linn Josefsson
+2. Sandra Danielsson
+3. Réka Madarász
 4. John Doe
 
 Tested by the following muggles (non-coders):
