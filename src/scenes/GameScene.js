@@ -13,7 +13,6 @@ import TwoBlockPlatform from '../assets/twoblockplatform.svg';
 import Player1 from '../assets/Sprite_player.png';
 import Player2 from '../assets/Sprite_player2.png';
 import Arrow from '../assets/arrow.png';
-import { socket } from './StartScene';
 
 let platforms;
 let player1;
@@ -21,18 +20,14 @@ let player2;
 
 let cursors;
 let keys;
-let weapon;
 let arrow;
-var arrows;
 let fireRate = 500;
-let nextFire = 0;
 let p1Display;
 let p1ArrowDisplay;
 
 let p2Display;
 let p2ArrowDisplay;
 
-// TODO: Reset these when a player is killed
 let player1CanShoot = true;
 let player1DirectionIsRight = true;
 let player1NumberOfArrows = 3;
@@ -189,18 +184,11 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.world.on('worldbounds', function (body) {
       if (body.position.x > 1523.1) {
-        // Went over on right side
         body.position.x = 0;
       } else if (body.position.x === 0) {
-        // Went over on left side
         body.position.x = 1523.1;
       } else if (body.position.y === 0) {
-        // THIS WAS BAD
-        // Went over top
-        // body.position.y = 823.1;
-        // body.setVelocityY(-1 * body.velocityY);
       } else if (body.position.y > 823.1) {
-        // Went over bottom
         body.position.y = 0;
       }
     });
@@ -316,7 +304,7 @@ export default class GameScene extends Phaser.Scene {
       // Stops player from walking when key is not pressed
       player1.setVelocityX(0);
 
-      player1.anims.stop(); // Have to change this so it does not turn left when stopped
+      player1.anims.stop();
     }
 
     if (keys.W.isDown && player1.body.touching.down) {
@@ -335,7 +323,7 @@ export default class GameScene extends Phaser.Scene {
       // Stops player from walking when key is not pressed
       player2.setVelocityX(0);
 
-      player2.anims.stop(); // Have to change this so it does not turn left when stopped
+      player2.anims.stop();
     }
 
     if (cursors.up.isDown && player2.body.touching.down) {
