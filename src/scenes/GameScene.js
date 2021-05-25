@@ -141,9 +141,6 @@ export default class GameScene extends Phaser.Scene {
 
     /** Crates **/
 
-    platforms.create(1340, 522, 'crate');
-    platforms.create(260, 522, 'crate');
-
     platforms
       .create(this.game.config.width / 2, 122, 'crate')
       .setScale(1)

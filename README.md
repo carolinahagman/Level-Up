@@ -12,14 +12,14 @@ Clone the repository to your computer
 ```
 $ git clone https://github.com/carolinahagman/Level-Up.git
 ```
-```cd``` into the project folder.
 
-type ```npm install``` followed by ```npm start```
+`cd` into the project folder.
 
-in your preferred browser type ```localhost:8080```
+type `npm install` followed by `npm start`
+
+in your preferred browser type `localhost:8080`
 
 Find a friend and play!
-
 
 # Changelog
 
@@ -34,6 +34,10 @@ Find a friend and play!
 - [#9 - Socket connection established](https://github.com/carolinahagman/Level-Up/pull/9)
 - [#10 - Local multiplayer added](https://github.com/carolinahagman/Level-Up/pull/10)
 - [#11 - Game over scene and game mechanics finished](https://github.com/carolinahagman/Level-Up/pull/11)
+- [#12 - Add changelogs](https://github.com/carolinahagman/Level-Up/pull/12)
+- [#13 - Add controls to start scene](https://github.com/carolinahagman/Level-Up/pull/13)
+- [#14 - Fix small mistakes](https://github.com/carolinahagman/Level-Up/pull/14)
+
 # Code Review
 
 1. `example.js:10-15` - Remember to think about X and this could be refactored using the amazing Y function.
