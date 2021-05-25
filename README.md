@@ -62,11 +62,11 @@ Tested by the following people:
 1. Linn Josefsson
 2. Sandra Danielsson
 3. Réka Madarász
-4. John Doe
+4. Dante Mogrim
 
 Tested by the following muggles (non-coders):
 
 1. Nina Blom
 2. Oscar Magnusson
-3. Jane Doe
-4. John Doe
+3. Emelie Landgren
+4. Sofia Alvrud
