@@ -39,6 +39,7 @@ Find a friend and play!
 - [#13 - Add controls to start scene](https://github.com/carolinahagman/Level-Up/pull/13)
 - [#14 - Fix small mistakes](https://github.com/carolinahagman/Level-Up/pull/14)
 - [#15 - Add a surprise feature and testers](https://github.com/carolinahagman/Level-Up/pull/15)
+- [#16 - Moved css file](https://github.com/carolinahagman/Level-Up/pull/18)
 
 # Code Review
 
