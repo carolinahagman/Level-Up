@@ -17,7 +17,7 @@ import Arrow from '../assets/arrow.png';
 let platforms;
 let player1;
 let player2;
-
+let crate;
 let cursors;
 let keys;
 let arrow;
@@ -141,10 +141,9 @@ export default class GameScene extends Phaser.Scene {
 
     /** Crates **/
 
-    platforms
-      .create(this.game.config.width / 2, 122, 'crate')
-      .setScale(1)
-      .refreshBody();
+    crate = this.physics.add
+      .staticGroup()
+      .create(this.game.config.width / 2, 122, 'crate');
 
     /** Display arrows left **/
 
@@ -266,6 +265,8 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(player1, platforms);
     this.physics.add.collider(player2, platforms);
     this.physics.add.collider(player1, player2);
+    this.physics.add.collider(player1, crate, player1CollideWithCrate);
+    this.physics.add.collider(player2, crate, player2CollideWithCrate);
   }
 
   positionPlayer1(ctx) {
@@ -463,6 +464,18 @@ function arrowCollideWithPlayer2(arrow) {
     p2ArrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
     console.log('Pickup arrow');
   }
+}
+
+function player1CollideWithCrate() {
+  player1NumberOfArrows += 1;
+  crate.destroy(true);
+  p1ArrowDisplay.setText(['Arrows left: ' + player1NumberOfArrows]);
+}
+
+function player2CollideWithCrate() {
+  player2NumberOfArrows += 1;
+  crate.destroy(true);
+  p2ArrowDisplay.setText(['Arrows left: ' + player2NumberOfArrows]);
 }
 
 /* Make sure the player can only shoot according to the fire rate */
